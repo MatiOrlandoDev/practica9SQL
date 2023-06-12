@@ -1,3 +1,4 @@
+CREATE DATABASE practica_8vfinal;
 #1)
 CREATE TABLE nombres (
 nombre VARCHAR (30))
@@ -38,24 +39,25 @@ INSERT INTO materias (id, descripcion) VALUES (2, 'DOO');
 INSERT INTO materias (id, descripcion) VALUES (3, 'Base de datos');
 INSERT INTO materias (id, descripcion) VALUES (4, 'Orga');
 
-#4)
+#4)Crear una tabla alumnos con el esquema "NombreYApellido" poblándola con todas las combinaciones de nombres y apellidos. Deberán generarse 80 alumnos.
 CREATE TABLE alumnos (
-nombre VARCHAR (30),
-apellido VARCHAR (30));
+NombreYApellido VARCHAR (50))
 
-INSERT INTO alumnos (nombre, apellido) SELECT * FROM nombres, apellidos;
+#Nuevo codigo
+INSERT INTO alumnos (NombreYApellido) SELECT CONCAT(n.nombre,' ',a.apellido) AS NombreYApellido FROM nombres n,  apellidos a;
 
 #5) Crear una tabla exámenes con el esquema "Nombre", "Materia", "Nota"
 #La nota puede calcularse con el id de la materia, la cantidad de letras (length) del nombre, y un cálculo que termine (........)%10 +1 (de modo que vaya de 1 a 10)
 #Todos los alumnos rindieron exámenes para todas las materias
    
 CREATE TABLE examenes (
-Nombre VARCHAR (30) NOT null,
+Nombre VARCHAR (50) NOT null,
 materia VARCHAR (30) NOT null,
 Nota INT NOT NULL);
 
+#Modificacion
 INSERT INTO examenes (Nombre, materia, Nota)
-SELECT alumnos.nombre, materias.descripcion, (LENGTH(alumnos.nombre) * materias.id % 10 + 1)
+SELECT alumnos.NombreYApellido, materias.descripcion, (LENGTH(alumnos.NombreYApellido) * materias.id % 10 + 1)
 FROM alumnos, materias;
 
 #6) Modificar la tabla de alumnos para que tenga una columna "Estado", alfanumérica
@@ -64,9 +66,8 @@ ALTER TABLE alumnos ADD Estado VARCHAR (30);
 
 #7) Para los alumnos que tengan algún aplazo, dejarle "Con Aplazo" en la columna "Estado"
 
-UPDATE alumnos SET Estado = 'Con Aplazo' WHERE Nombre IN (SELECT DISTINCT Nombre FROM examenes WHERE Nota < 4)
+UPDATE alumnos SET Estado = 'Con Aplazo' WHERE NombreYAPellido IN (SELECT Distinct Nombre FROM examenes WHERE Nota < 4)
 
-UPDATE alumnos SET Estado = 'Aprobado' WHERE Nombre IN (SELECT DISTINCT Nombre FROM examenes WHERE Nota > 4)
 
 #8)Agregar columna Descripción en la tabla de exámenes
 
@@ -77,7 +78,3 @@ ALTER TABLE examenes ADD Descripcion VARCHAR (30);
 UPDATE examenes
 SET Descripcion = 'Recuperatorio'
 WHERE Nota < 4;
-
-UPDATE examenes
-SET Descripcion = 'Aprobado'
-WHERE Nota > 4;
